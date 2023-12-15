@@ -1,5 +1,4 @@
 import argparse
-import random
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt            
@@ -15,7 +14,7 @@ def create_array(rows: int,cols: int, pos_value_density: float) -> np.array:
     the percentage of ones in the array.
     
     Returns:
-    array
+    numpy array
     '''
     
     arr = np.random.rand(rows,cols)
@@ -109,18 +108,21 @@ def main():
 
     args = parser.parse_args()
 
+    #create array and get number of positive values
     init_arr = create_array(args.rows,args.cols,args.pos_value_density)
-    print(init_arr.shape)
     pos_vals = np.dstack(np.where(init_arr>0))[0]
-
+    print(f'The array is {init_arr.shape[0]} x {init_arr.shape[1]} with {len(pos_vals)} positive values.')
+    
+    #detect neighbors and return updated array
     neighbors=detect_neighbors(init_arr,pos_vals,args.distance)
 
+    #get neighbor and overlap counts
     count, overlaps = get_grid_counts(neighbors)
-
 
     print(f'Total Neighbor Detections: {count}')
     print(f'Total Overlap Detections: {overlaps}')
 
+    #plot array
     if args.plot_data:
         ax = sns.heatmap(neighbors, cbar=False)
         plt.show()
