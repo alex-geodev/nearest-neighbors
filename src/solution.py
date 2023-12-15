@@ -35,6 +35,8 @@ def is_within_distance(index: tuple,pos_val: list,distance: int) -> float:
     '''
     
     dist = abs(index[0]-pos_val[0]) +abs(index[1]-pos_val[1])
+
+    #return a float to provide a gradient visualization of cell distance
     return 1/dist if 0<dist<=distance else 0
 
 def detect_neighbors(init_array: np.array,pos_vals: list,distance: int):
@@ -66,7 +68,7 @@ def detect_neighbors(init_array: np.array,pos_vals: list,distance: int):
 def get_grid_counts(neighbors):
     '''Get count of true neighbors and overlaps.'''
     count= np.count_nonzero(neighbors)
-    overlaps  = np.count_nonzero(np.where(neighbors==2))
+    overlaps  = np.count_nonzero(neighbors[neighbors==2])
     return count,overlaps
 
 def range_limited_float_type(arg):
