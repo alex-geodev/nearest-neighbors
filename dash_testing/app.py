@@ -61,4 +61,3 @@ def update_chart(dist,rows,cols,scale):
 
 if __name__ == '__main__':
     app.run(debug=True)
-p
