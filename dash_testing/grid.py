@@ -1,34 +1,43 @@
 import random
 import numpy as np
+from dataclasses import dataclass
 
+@dataclass
 class Grid():
-    def __init__(self, rows: int = random.randrange(1,100),
-                  cols: int = random.randrange(1,100),
-                  density: float = 0.98) -> np.array:
-        
-        self.rows = rows
-        self.cols = cols
-        self.density = density
-        self.grid = np.random.rand(self.rows,self.cols)
-        self.grid = (self.grid>self.density).astype(float)
+
+    rows: int = random.randint(20,100)
+    cols: int = random.randint(20,100)
+    density: float = 0.02
+    distance: int = 2
+
+    def __post_init__(self):
+        self.grid: np.array = self._create_grid()
+        self.pos_vals: list = self._get_positive_values()
+
+    def _create_grid(self):
+        grid = np.random.rand(self.rows,self.cols)
+        return (grid>1-self.density).astype(float)
     
-def get_positive_values(self):
-    self.pos_vals = np.dstack(np.where(self.grid>0))[0]
 
-def determine_cell_distance(self,grid_index,pos_val,distance):
-    cell_distance = abs(grid_index[0]-pos_val[0]) +abs(grid_index[1]-pos_val[1])
-    return 1/cell_distance if 0<cell_distance<=distance else 0
+    def _is_within_distance(self, index: tuple, value: int) -> float:
+        #manhattan distance formula
+        distance = abs(index[0]-value[0]) +abs(index[1]-value[1])
+        return 1/distance if 0<distance<=self.distance else 0
+    
+    def _get_positive_values(self):
+        return np.dstack(np.where(self.grid>0))[0]
 
-def detect_neighbors(self,pos_vals,distance):
+    def detect_neighbors(self):
+        #create modified array for testing/debugging comparisons against init_arr
+        mod_arr = self.grid.copy()
+        for value in self.pos_vals:
+            arr_iterable = np.nditer(mod_arr, flags = ["multi_index"])
 
-    mod_arr = self.grid.copy()
-    for value in pos_vals:
-        arr_iterable = np.nditer(mod_arr, flags = ["multi_index"])
+            for item in arr_iterable:
+                if not item:
+                    mod_arr[arr_iterable.multi_index] = self._is_within_distance(arr_iterable.multi_index,value)
 
-        for item in arr_iterable:
-            if not item:
-                mod_arr[arr_iterable.multi_index]=determine_cell_distance(arr_iterable.multi_index,value,distance)
-
-            elif item !=1 and determine_cell_distance(arr_iterable.multi_index,value,distance):
-                mod_arr[arr_iterable.multi_index]=2
-    return mod_arr
+                elif item !=1 and self._is_within_distance(arr_iterable.multi_index,value):
+                    #set overlapping cells to a unique value for plotting purposes
+                    mod_arr[arr_iterable.multi_index]=2
+        self.neighbors = mod_arr
